@@ -16,8 +16,8 @@ namespace EarTrainer
 
         public Gui()
         {
-            model = new Model();
             InitializeComponent();
+            model = new Model();
         }
 
         public static void Main()
