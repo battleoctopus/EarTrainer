@@ -22,6 +22,28 @@ namespace EarTrainer
         private Random random = new Random();
         private bool isInterval = false;
 
+        private int GetInterval(string intervalName)
+        {
+            Dictionary<string, int> intervalNames = new Dictionary<string, int>()
+            {
+                {"P1", 0},
+                {"m2", 1},
+                {"M2", 2},
+                {"m3", 3},
+                {"M3", 4},
+                {"P4", 5},
+                {"A4", 6},
+                {"P5", 7},
+                {"m6", 8},
+                {"M6", 9},
+                {"m7", 10},
+                {"M7", 11},
+                {"P8", 12}
+            };
+
+            return intervalNames[intervalName];
+        }
+
         private string GetIntervalName(int interval)
         {
             Dictionary<int, string> intervals = new Dictionary<int, string>()
@@ -42,6 +64,52 @@ namespace EarTrainer
             };
 
             return intervals[interval];
+        }
+
+        private int GetNote(string noteName)
+        {
+            Dictionary<string, int> noteNames = new Dictionary<string, int>()
+            {
+                {"C3", 27},
+                {"C#3", 28},
+                {"D3", 29},
+                {"D#3", 30},
+                {"E3", 31},
+                {"F3", 32},
+                {"F#3", 33},
+                {"G3", 34},
+                {"G#3", 35},
+                {"A3", 36},
+                {"A#3", 37},
+                {"B3", 38},
+                {"C4", 39},
+                {"C#4", 40},
+                {"D4", 41},
+                {"D#4", 42},
+                {"E4", 43},
+                {"F4", 44},
+                {"F#4", 45},
+                {"G4", 46},
+                {"G#4", 47},
+                {"A4", 48},
+                {"A#4", 49},
+                {"B4", 50},
+                {"C5", 51},
+                {"C#5", 52},
+                {"D5", 53},
+                {"D#5", 54},
+                {"E5", 55},
+                {"F5", 56},
+                {"F#5", 57},
+                {"G5", 58},
+                {"G#5", 59},
+                {"A5", 60},
+                {"A#5", 61},
+                {"B5", 62},
+                {"C6", 63}
+            };
+
+            return noteNames[noteName];
         }
 
         private string GetNoteName(int note)
@@ -115,32 +183,40 @@ namespace EarTrainer
             MidiPlayer.CloseMidi();
         }
 
-        public void Play(int note1)
+        public void Play(string note1)
         {
             MidiPlayer.OpenMidi();
             MidiPlayer.Play(new NoteOn(deltaTime,
                                        channel,
-                                       GetNoteName(note1),
+                                       note1,
                                        maxVolume));
             System.Threading.Thread.Sleep(finishTime);
             MidiPlayer.CloseMidi();
         }
 
-        public void Play(int note1, int interval)
+        public void Play(string note1, string interval, string direction)
         {
             MidiPlayer.OpenMidi();
             MidiPlayer.Play(new NoteOn(deltaTime,
                                        channel,
-                                       GetNoteName(note1),
+                                       note1,
                                        maxVolume));
             System.Threading.Thread.Sleep(intervalTime);
             MidiPlayer.Play(new NoteOff(deltaTime,
                                         channel,
-                                        GetNoteName(note1),
+                                        note1,
                                         maxVolume));
+            int directionalInterval = GetInterval(interval);
+
+            if (direction == "Down")
+            {
+                directionalInterval *= -1;
+            }
+
+            string note2 = GetNoteName(GetNote(note1) + directionalInterval);
             MidiPlayer.Play(new NoteOn(deltaTime,
                                         channel,
-                                        GetNoteName(note1 + interval),
+                                        note2,
                                         maxVolume));
             System.Threading.Thread.Sleep(finishTime);
             MidiPlayer.CloseMidi();
@@ -163,11 +239,11 @@ namespace EarTrainer
             if (isInterval)
             {
                 string interval = GetIntervalName(Math.Abs(note1 - note2));
-                string direction = "up";
+                string direction = "Up";
 
                 if (note2 < note1)
                 {
-                    direction = "down";
+                    direction = "Down";
                 }
 
                 string note1Name = GetNoteName(note1);
